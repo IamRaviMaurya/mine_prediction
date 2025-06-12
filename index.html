@@ -128,26 +128,17 @@
 </head>
 <body>
   <div class="container">
-    <div class="result">Game results will be displayed here.</div>
+    <div class="result">Prediction results will be displayed here.</div>
 
     <div class="grid" id="grid"></div>
 
     <button class="button" onclick="startPrediction()">Bet</button>
 
-    <div class="section amount-section">
-      <label>Amount</label>
-      <div class="amount-controls">
-        <input type="number" id="amount" value="10" min="1" />
-        <button onclick="halveAmount()">/2</button>
-        <button onclick="doubleAmount()">x2</button>
-      </div>
-    </div>
-
     <div class="section mines-section">
       <label>Mines</label>
       <div class="slider-container">
         <span id="mineValue">4</span>
-        <input type="range" min="1" max="24" value="4" id="mines" onchange="updateMineValue()" />
+        <input type="range" min="1" max="3" value="4" id="mines" onchange="updateMineValue()" />
       </div>
     </div>
   </div>
