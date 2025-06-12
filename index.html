@@ -14,7 +14,7 @@
 
     <div class="grid" id="grid"></div>
 
-    <button class="button" onclick="startPrediction()"> Get Prediction</button>
+    <button class="button" onclick="startPrediction()">Get Prediction</button>
 
     <div class="section mines-section">
       <label>Mines</label>
@@ -25,6 +25,22 @@
     </div>
   </div>
 
+  <!-- Your main script -->
   <script src="script.js"></script>
+
+  <!-- ✅ Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Makes the WebApp fullscreen
+    tg.ready();  // Notify Telegram that your WebApp is ready
+
+    // Optional: Access user info
+    const user = tg.initDataUnsafe?.user;
+    console.log("Hello from Telegram WebApp, " + (user?.first_name || "Guest"));
+
+    // Optional: send data back to bot if needed
+    // tg.sendData("User opened the game");
+  </script>
 </body>
 </html>
