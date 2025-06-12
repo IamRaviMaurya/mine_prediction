@@ -2,150 +2,205 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mine Prediction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mine Prediction Game</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
-    }
-
-    h1 {
-      font-size: 3em;
-      margin-bottom: 20px;
-      color: #bb86fc;
-    }
-
-    .controls {
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      height: 100vh;
     }
 
-    select, button {
-      padding: 10px 20px;
-      font-size: 1.1em;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
+    .container {
+      background: #1e1e1e;
+      border: 2px solid #444;
+      border-radius: 12px;
+      padding: 20px;
+      width: 350px;
+      box-shadow: 0 0 10px #000;
     }
 
-    select {
-      background-color: #2d2d2d;
-      color: white;
-    }
-
-    button {
-      background-color: #6200ee;
-      color: white;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #3700b3;
+    .result {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #aaa;
     }
 
     .grid {
-      margin-top: 10px;
       display: grid;
-      grid-template-columns: repeat(5, 60px);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
+      margin-bottom: 20px;
     }
 
     .cell {
-      width: 60px;
-      height: 60px;
-      background-color: #1f1f1f;
-      border-radius: 8px;
+      width: 50px;
+      height: 50px;
+      background: #2a2a2a;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: 22px;
       color: #bb86fc;
-      box-shadow: inset 0 0 5px #000;
-      transition: background 0.3s ease, transform 0.2s;
+      cursor: pointer;
+      transition: 0.2s;
     }
 
-    .diamond {
-      background-color: #2b0047;
-      color: #b56cf3;
-      box-shadow: 0 0 8px #9b59b6, inset 0 0 6px #2b0047;
-      transform: scale(1.1);
+    .cell.revealed {
+      background: #3c3c3c;
     }
 
-    .fade-in {
-      animation: fadeIn 0.4s ease;
+    .button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      background: linear-gradient(to right, #00c853, #64dd17);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 20px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1.1); }
+    .section {
+      margin-bottom: 15px;
+    }
+
+    .section label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ccc;
+    }
+
+    .amount-section, .mines-section {
+      background: #2c2c2c;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .amount-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .amount-controls input[type="number"] {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #1e1e1e;
+      color: white;
+    }
+
+    .amount-controls button {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    input[type=range] {
+      width: 100%;
+    }
+
+    .slider-value {
+      font-size: 14px;
+      margin-top: 5px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>💣 Mine Prediction 💣</h1>
+  <div class="container">
+    <div class="result">Game results will be displayed here.</div>
 
-  <div class="controls">
-    <label for="bombSelect">Select Bombs:</label>
-    <select id="bombSelect">
-      <option value="1">1 Bomb</option>
-      <option value="2">2 Bombs</option>
-      <option value="3">3 Bombs</option>
-      <option value="4">4 Bombs</option>
-      <option value="5">5 Bombs</option>
-    </select>
-    <button onclick="showDiamonds()">🔮 Predict</button>
+    <div class="grid" id="grid"></div>
+
+    <button class="button" onclick="startPrediction()">Bet</button>
+
+    <div class="section amount-section">
+      <label>Amount</label>
+      <div class="amount-controls">
+        <input type="number" id="amount" value="10" min="1" />
+        <button onclick="halveAmount()">/2</button>
+        <button onclick="doubleAmount()">x2</button>
+      </div>
+    </div>
+
+    <div class="section mines-section">
+      <label>Mines</label>
+      <div class="slider-container">
+        <span id="mineValue">4</span>
+        <input type="range" min="1" max="24" value="4" id="mines" onchange="updateMineValue()" />
+      </div>
+    </div>
   </div>
 
-  <div class="grid" id="grid"></div>
-
   <script>
+    const gridElement = document.getElementById('grid');
+    const mineSlider = document.getElementById('mines');
+    const mineValue = document.getElementById('mineValue');
     const gridSize = 5;
     const totalCells = gridSize * gridSize;
 
-    const gridElement = document.getElementById('grid');
-    const bombSelect = document.getElementById('bombSelect');
-
-    function createEmptyGrid() {
+    function createGrid() {
       gridElement.innerHTML = '';
       for (let i = 0; i < totalCells; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        cell.id = `cell-${i}`;
+        cell.textContent = '';
         gridElement.appendChild(cell);
       }
     }
 
-    function showDiamonds() {
-      createEmptyGrid(); // reset grid
+    function updateMineValue() {
+      mineValue.textContent = mineSlider.value;
+    }
 
-      const bombs = parseInt(bombSelect.value);
-      const diamondsToShow = 5 - bombs;
+    function halveAmount() {
+      const amt = document.getElementById('amount');
+      amt.value = Math.max(1, Math.floor(amt.value / 2));
+    }
+
+    function doubleAmount() {
+      const amt = document.getElementById('amount');
+      amt.value = parseInt(amt.value) * 2;
+    }
+
+    function startPrediction() {
+      const bombs = parseInt(mineSlider.value);
+      const diamondsToShow = 5 - Math.min(bombs, 5); // Show 0-5 diamonds based on bombs
+      createGrid();
 
       const diamondIndexes = new Set();
       while (diamondIndexes.size < diamondsToShow) {
-        const randomIndex = Math.floor(Math.random() * totalCells);
-        diamondIndexes.add(randomIndex);
+        diamondIndexes.add(Math.floor(Math.random() * totalCells));
       }
 
       diamondIndexes.forEach(index => {
-        const cell = document.getElementById(`cell-${index}`);
+        const cell = gridElement.children[index];
         cell.textContent = '💎';
-        cell.classList.add('diamond', 'fade-in');
+        cell.classList.add('revealed');
       });
     }
 
-    // Initialize empty grid
-    createEmptyGrid();
+    createGrid();
   </script>
 </body>
 </html>
