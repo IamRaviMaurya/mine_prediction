@@ -139,10 +139,20 @@
     transform: rotate(360deg);
   }
 }
+
+.time {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #bbb;
+}
+
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="time" id="timeDisplay">--:--:--</div>
+
     <div class="result">Prediction results will be displayed here.</div>
 
     <div class="grid" id="grid"></div>
@@ -152,7 +162,7 @@
     <div class="section mines-section">
       <label>Mines</label>
       <div class="slider-container">
-        <span id="mineValue">4</span>
+        <span id="mineValue">3</span>
         <input type="range" min="1" max="3" value="3" id="mines" onchange="updateMineValue()" />
       </div>
     </div>
@@ -210,6 +220,17 @@
 }
 
     createGrid();
+
+    function updateTime() {
+  const timeElement = document.getElementById('timeDisplay');
+  const now = new Date();
+  const timeString = now.toLocaleTimeString();
+  timeElement.textContent = timeString;
+}
+
+setInterval(updateTime, 1000);
+updateTime(); // initialize immediately
+
   </script>
 </body>
 </html>
