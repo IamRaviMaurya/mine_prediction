@@ -1,1 +1,1 @@
-# mine_prediction
+# MINE Prediction App
