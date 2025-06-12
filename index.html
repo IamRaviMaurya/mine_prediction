@@ -124,6 +124,21 @@
       margin-top: 5px;
       text-align: center;
     }
+
+    .loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #bb86fc;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
   </style>
 </head>
 <body>
@@ -175,21 +190,24 @@
     }
 
     function startPrediction() {
-      const bombs = parseInt(mineSlider.value);
-      const diamondsToShow = 5 - Math.min(bombs, 5); // Show 0-5 diamonds based on bombs
-      createGrid();
+  const bombs = parseInt(mineSlider.value);
+  const diamondsToShow = 5 - Math.min(bombs, 5);
+  createGrid();
 
-      const diamondIndexes = new Set();
-      while (diamondIndexes.size < diamondsToShow) {
-        diamondIndexes.add(Math.floor(Math.random() * totalCells));
-      }
+  const diamondIndexes = Array.from({ length: totalCells }, (_, i) => i)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, diamondsToShow);
 
-      diamondIndexes.forEach(index => {
-        const cell = gridElement.children[index];
-        cell.textContent = '💎';
-        cell.classList.add('revealed');
-      });
-    }
+  diamondIndexes.forEach((index, i) => {
+    const cell = gridElement.children[index];
+    cell.innerHTML = '<div class="loader"></div>'; // show loader
+
+    setTimeout(() => {
+      cell.innerHTML = '💎';
+      cell.classList.add('revealed');
+    }, 400 + i * 200); // delay each diamond a bit
+  });
+}
 
     createGrid();
   </script>
