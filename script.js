@@ -1,8 +1,10 @@
 const gridElement = document.getElementById('grid');
 const mineSlider = document.getElementById('mines');
 const mineValue = document.getElementById('mineValue');
+const button = document.querySelector('.button');
 const gridSize = 5;
 const totalCells = gridSize * gridSize;
+let countdownInterval = null;
 
 function createGrid() {
   gridElement.innerHTML = '';
@@ -19,9 +21,14 @@ function updateMineValue() {
 }
 
 function startPrediction() {
+  // Disable button
+  disableButtonForOneMinute();
+
+  // Reset grid
+  createGrid();
+
   const bombs = parseInt(mineSlider.value);
   const diamondsToShow = 5 - Math.min(bombs, 5);
-  createGrid();
 
   const diamondIndexes = Array.from({ length: totalCells }, (_, i) => i)
     .sort(() => Math.random() - 0.5)
@@ -29,13 +36,31 @@ function startPrediction() {
 
   diamondIndexes.forEach((index, i) => {
     const cell = gridElement.children[index];
-    cell.innerHTML = '<div class="loader"></div>'; // show loader
-
+    cell.innerHTML = '<div class="loader"></div>'; // loader
     setTimeout(() => {
       cell.innerHTML = '💎';
       cell.classList.add('revealed');
     }, 400 + i * 200);
   });
+}
+
+function disableButtonForOneMinute() {
+  let remainingTime = 60;
+  button.disabled = true;
+  button.style.opacity = 0.6;
+  button.textContent = `Wait ${remainingTime}s`;
+
+  countdownInterval = setInterval(() => {
+    remainingTime--;
+    if (remainingTime > 0) {
+      button.textContent = `Wait ${remainingTime}s`;
+    } else {
+      clearInterval(countdownInterval);
+      button.disabled = false;
+      button.style.opacity = 1;
+      button.textContent = 'Get Prediction';
+    }
+  }, 1000);
 }
 
 function updateTime() {
@@ -46,5 +71,5 @@ function updateTime() {
 }
 
 setInterval(updateTime, 1000);
-updateTime(); // initialize immediately
+updateTime(); // initialize
 createGrid();

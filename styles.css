@@ -139,3 +139,9 @@ input[type=range] {
   margin-bottom: 8px;
   color: #bbb;
 }
+
+.button:disabled {
+  cursor: not-allowed;
+  background: #888;
+}
+
