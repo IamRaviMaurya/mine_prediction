@@ -28,7 +28,7 @@ function startPrediction() {
   createGrid();
 
   const bombs = parseInt(mineSlider.value);
-  const diamondsToShow = 5 - Math.min(bombs, 5);
+  const diamondsToShow = 6 - Math.min(bombs, 5);
 
   const diamondIndexes = Array.from({ length: totalCells }, (_, i) => i)
     .sort(() => Math.random() - 0.5)
