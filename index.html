@@ -3,85 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mine Prediction</title>
+  <title>Mine Prediction Grid</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      background: linear-gradient(to bottom right, #001F3F, #0074D9);
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
     }
 
     h1 {
-      font-size: 3em;
-      margin-bottom: 30px;
-      color: #ffcc00;
+      margin-bottom: 20px;
     }
 
-    button {
-      padding: 15px 30px;
-      font-size: 1.2em;
-      background-color: #28a745;
-      color: white;
-      border: none;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .tile {
+      width: 60px;
+      height: 60px;
+      background-color: #002244;
       border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
 
-    button:hover {
-      background-color: #218838;
+    .tile.safe {
+      background-color: #ffaa00;
+      color: white;
     }
 
-    .prediction {
-      margin-top: 40px;
-      font-size: 2em;
-      color: #00ffff;
-      transition: all 0.3s ease;
+    .tile.mine {
+      background-color: red;
+      color: white;
     }
 
-    .fade-in {
-      animation: fadeIn 0.6s ease-in-out;
+    .tile.revealed {
+      cursor: default;
+      pointer-events: none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    .info {
+      margin-top: 20px;
+      font-size: 1.2em;
     }
   </style>
 </head>
 <body>
-  <h1>💣 Mine Prediction 💣</h1>
-  <button onclick="showPrediction()">🔮 Predict</button>
-  <div class="prediction" id="prediction"></div>
+  <h1>💣 Mine Prediction Game</h1>
+  <div class="grid" id="grid"></div>
+  <div class="info" id="info">Click a tile to reveal!</div>
 
   <script>
-    const predictions = [
-      "💥 Boom! You hit a mine!",
-      "✅ Safe move. You're lucky!",
-      "⚠️ Danger nearby! Be careful.",
-      "🎯 You just missed a mine!",
-      "🍀 Lucky guess! All clear.",
-      "🛑 Warning! High risk ahead.",
-      "💣 Close one! But you're safe.",
-      "🤖 AI says: Play smart!",
-      "🕵️‍♂️ No mine here... yet!",
-      "🔥 You're on fire! Safe again."
-    ];
+    const rows = 5;
+    const cols = 5;
+    const mineCount = 3;
+    let grid = [];
+    let revealedCount = 0;
 
-    function showPrediction() {
-      const predictionBox = document.getElementById('prediction');
-      const randomIndex = Math.floor(Math.random() * predictions.length);
-      predictionBox.textContent = predictions[randomIndex];
-      predictionBox.classList.remove('fade-in'); // reset animation
-      void predictionBox.offsetWidth; // reflow
-      predictionBox.classList.add('fade-in');
+    function createGrid() {
+      const container = document.getElementById('grid');
+      container.innerHTML = '';
+      grid = [];
+      revealedCount = 0;
+
+      // Generate grid data
+      const total = rows * cols;
+      const minePositions = new Set();
+      while (minePositions.size < mineCount) {
+        minePositions.add(Math.floor(Math.random() * total));
+      }
+
+      for (let i = 0; i < total; i++) {
+        const isMine = minePositions.has(i);
+        grid.push({ id: i, isMine, revealed: false });
+
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.dataset.id = i;
+        tile.addEventListener('click', onTileClick);
+        container.appendChild(tile);
+      }
     }
+
+    function onTileClick(e) {
+      const id = +e.target.dataset.id;
+      const tileData = grid[id];
+      if (tileData.revealed) return;
+
+      tileData.revealed = true;
+      const tileEl = e.target;
+      tileEl.classList.add('revealed');
+
+      if (tileData.isMine) {
+        tileEl.classList.add('mine');
+        tileEl.textContent = '💣';
+        document.getElementById('info').textContent = 'Boom! You hit a mine 💥';
+        revealAll();
+      } else {
+        tileEl.classList.add('safe');
+        tileEl.textContent = '⭐';
+        revealedCount++;
+        document.getElementById('info').textContent = `Safe! ${revealedCount} tiles cleared.`;
+        if (revealedCount + mineCount === rows * cols) {
+          document.getElementById('info').textContent = '🎉 You cleared the whole board!';
+        }
+      }
+    }
+
+    function revealAll() {
+      for (let i = 0; i < grid.length; i++) {
+        const tileData = grid[i];
+        if (!tileData.revealed) {
+          const tileEl = document.querySelector(`.tile[data-id="${i}"]`);
+          tileEl.classList.add('revealed');
+          if (tileData.isMine) {
+            tileEl.classList.add('mine');
+            tileEl.textContent = '💣';
+          } else {
+            tileEl.classList.add('safe');
+            tileEl.textContent = '⭐';
+          }
+        }
+      }
+    }
+
+    // Initialize
+    createGrid();
   </script>
 </body>
 </html>
